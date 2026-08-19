@@ -1,0 +1,162 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+  <meta name="theme-color" content="#f7f5f0" />
+  <title>我們的買房清單</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="app-shell">
+    <header class="topbar">
+      <div>
+        <p class="eyebrow">HOME LIST</p>
+        <h1>我們的買房清單</h1>
+      </div>
+      <button class="icon-btn" id="openAdd" aria-label="新增房屋">＋</button>
+    </header>
+
+    <main>
+      <section class="progress-grid" id="progressGrid">
+        <button class="progress-card active" data-filter="all">
+          <span>全部</span><strong id="countAll">6</strong>
+        </button>
+        <button class="progress-card" data-filter="saved">
+          <span>收藏</span><strong id="countSaved">2</strong>
+        </button>
+        <button class="progress-card" data-filter="todo">
+          <span>待看</span><strong id="countTodo">2</strong>
+        </button>
+        <button class="progress-card" data-filter="seen">
+          <span>已看</span><strong id="countSeen">2</strong>
+        </button>
+      </section>
+
+      <section class="area-filter-wrap">
+        <div class="section-label">區域</div>
+        <div class="area-filter" id="areaFilter">
+          <button class="area-chip active" data-area="all">全部</button>
+          <button class="area-chip" data-area="竹北">竹北</button>
+          <button class="area-chip" data-area="新莊">新莊</button>
+          <button class="area-chip" data-area="好市多">好市多</button>
+          <button class="area-chip" data-area="新竹">新竹</button>
+        </div>
+      </section>
+
+      <section class="section-head">
+        <div>
+          <p class="eyebrow">PROPERTY LIST</p>
+          <h3>房屋清單</h3>
+        </div>
+        <div class="segmented">
+          <button class="seg active" data-view="cards">清單</button>
+          <button class="seg" data-view="table">比較</button>
+        </div>
+      </section>
+
+      <section id="cardView" class="property-list"></section>
+
+      <section id="tableView" class="compare-wrap hidden">
+        <div class="compare-tip">左右滑動比較已看與候選房屋</div>
+        <div class="compare-table" id="compareTable"></div>
+      </section>
+    </main>
+
+    <nav class="bottom-nav">
+      <button class="nav-item active" data-nav="home">
+        <span>⌂</span><small>首頁</small>
+      </button>
+      <button class="nav-item" data-nav="todo">
+        <span>◉</span><small>待看</small>
+      </button>
+      <button class="fab" id="fabAdd" aria-label="新增房屋">＋</button>
+      <button class="nav-item" data-nav="compare">
+        <span>⇄</span><small>比較</small>
+      </button>
+      <button class="nav-item" data-nav="candidate">
+        <span>★</span><small>候選</small>
+      </button>
+    </nav>
+  </div>
+
+  <div class="sheet-backdrop hidden" id="sheetBackdrop"></div>
+
+  <section class="bottom-sheet hidden" id="detailSheet" aria-modal="true" role="dialog">
+    <div class="sheet-grab"></div>
+    <div id="detailContent"></div>
+  </section>
+
+  <section class="bottom-sheet hidden" id="addSheet" aria-modal="true" role="dialog">
+    <div class="sheet-grab"></div>
+    <div class="sheet-head">
+      <div>
+        <p class="eyebrow">ADD PROPERTY</p>
+        <h3>新增房屋</h3>
+      </div>
+      <button class="icon-btn small" data-close>×</button>
+    </div>
+
+    <form id="addForm" class="form-grid">
+      <label>房屋名稱
+        <input name="name" placeholder="例如：竹北高鐵兩房" required />
+      </label>
+
+      <div class="two-col">
+        <label>總價（萬）
+          <input name="price" type="number" placeholder="2380" required />
+        </label>
+        <label>坪數
+          <input name="area" type="number" step="0.1" placeholder="26.8" required />
+        </label>
+      </div>
+
+      <label>房屋地址
+        <div id="googleAddressMount" class="google-address-mount">
+          <div class="maps-placeholder">Google 地址搜尋載入中…</div>
+        </div>
+        <input name="location" id="locationFallback" class="hidden-input" placeholder="請先設定 Google Maps API Key" />
+        <input type="hidden" name="lat" id="selectedLat" />
+        <input type="hidden" name="lng" id="selectedLng" />
+        <input type="hidden" name="zone" id="selectedZone" />
+        <input type="hidden" name="nearestName" id="selectedNearestName" />
+        <input type="hidden" name="nearestDistance" id="selectedNearestDistance" />
+        <small class="form-help" id="locationStatus">選擇 Google 建議地址後，會自動判斷最近據點。</small>
+      </label>
+
+      <div id="nearestPreview" class="nearest-preview hidden">
+        <span>自動分類</span>
+        <strong id="nearestPreviewTitle">—</strong>
+        <small id="nearestPreviewDistance">—</small>
+      </div>
+
+      <div class="two-col">
+        <label>格局
+          <input name="layout" placeholder="2房2廳1衛" />
+        </label>
+        <label>屋齡
+          <input name="age" placeholder="8 年" />
+        </label>
+      </div>
+
+      <label>房仲
+        <input name="agent" placeholder="例如：永慶房屋 王先生" />
+      </label>
+
+      <label>房仲聯絡方式
+        <input name="agentContact" placeholder="電話 / LINE / 其他" />
+      </label>
+
+      <label>物件網址
+        <input name="url" type="url" placeholder="https://..." />
+      </label>
+
+      <button class="primary-btn" type="submit">加入收藏</button>
+    </form>
+  </section>
+
+  <script src="config.js"></script>
+  <script src="maps.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
