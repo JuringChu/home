@@ -4,5 +4,5 @@
 // 3. 將下面 YOUR_GOOGLE_MAPS_API_KEY 換成你的 Key
 // 4. 正式放 GitHub Pages 前，務必限制 HTTP referrer 與 API 範圍
 window.HOME_MAPS_CONFIG = {
-  apiKey: "YOUR_GOOGLE_MAPS_API_KEY"
+  apiKey: "AIzaSyDzAQsXyN9hIRSEIH1TotL9GvPVF_h9D1I"
 };
