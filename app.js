@@ -30,6 +30,7 @@ const advantages = ["離車站近","附近熱鬧","有充電樁","廁所有窗",
 
 function persist(){ localStorage.setItem("homebuying-properties-v2", JSON.stringify(properties)); window.HomeSync?.save(properties); }
 function fmtPrice(n){ return Number(n).toLocaleString("zh-TW"); }
+function floorText(p){ return p.floor ? `${p.floor} / ${p.totalFloors || "?"} 樓` : "樓層未填"; }
 
 function renderCounts(){
   document.querySelector("#countAll").textContent = properties.filter(p=>p.status!=="rejected").length;
@@ -67,7 +68,7 @@ function renderCards(){
         <div class="card-title-row">
           <div>
             <h4>${p.name}</h4>
-            <p class="meta">${p.location}<br>${p.area} 坪 · ${p.layout || "格局未填"} · 屋齡 ${p.age || "未填"}${p.nearestName ? `<br>最近：${p.nearestName} · ${HomeMaps.formatDistance(Number(p.nearestDistance))}` : ""}</p>
+            <p class="meta">${p.location}<br>${p.area} 坪 · ${p.layout || "格局未填"} · ${floorText(p)} · 屋齡 ${p.age || "未填"}${p.nearestName ? `<br>最近：${p.nearestName} · ${HomeMaps.formatDistance(Number(p.nearestDistance))}` : ""}</p>
           </div>
           <div class="price">${fmtPrice(p.price)}<small> 萬</small></div>
         </div>
@@ -101,6 +102,7 @@ function renderCompare(){
     ["總價", ...targets.map(p=>`${fmtPrice(p.price)} 萬`)],
     ["坪數", ...targets.map(p=>`${p.area} 坪`)],
     ["格局", ...targets.map(p=>p.layout)],
+    ["樓層", ...targets.map(p=>floorText(p))],
     ["採光", ...targets.map(p=>rateCell(p.ratings.light))],
     ["通風", ...targets.map(p=>rateCell(p.ratings.air))],
     ["隔音", ...targets.map(p=>rateCell(p.ratings.noise))],
@@ -176,7 +178,7 @@ function openDetail(id, ratingMode=false){
 
     <div class="detail-summary">
       <div class="big-price">${fmtPrice(p.price)} 萬</div>
-      <div class="muted">${p.location} · ${p.area} 坪 · ${p.layout} · 屋齡 ${p.age}${p.agent ? `<br>房仲：${p.agent}` : ""}${p.agentContact ? ` · ${p.agentContact}` : ""}</div>
+      <div class="muted">${p.location} · ${p.area} 坪 · ${p.layout} · ${floorText(p)} · 屋齡 ${p.age}${p.agent ? `<br>房仲：${p.agent}` : ""}${p.agentContact ? ` · ${p.agentContact}` : ""}</div>
       ${p.nearestName ? `<div class="location-block">
         <div class="location-label">最近據點</div>
         <div class="location-main">
@@ -356,6 +358,8 @@ function openEdit(id){
   document.querySelector("#editNearestDistance").value=p.nearestDistance??"";
   document.querySelector("#editLayout").value=p.layout||"";
   document.querySelector("#editAge").value=p.age||"";
+  document.querySelector("#editFloor").value=p.floor??"";
+  document.querySelector("#editTotalFloors").value=p.totalFloors??"";
   document.querySelector("#editAgent").value=p.agent||"";
   document.querySelector("#editAgentContact").value=p.agentContact||"";
   document.querySelector("#editUrl").value=p.url||"";
@@ -385,6 +389,7 @@ document.querySelector("#editForm").addEventListener("submit",e=>{
     location:fd.get("location"), lat:Number(fd.get("lat"))||null, lng:Number(fd.get("lng"))||null,
     zone:fd.get("zone")||p.zone||"", nearestName:fd.get("nearestName")||"",
     nearestDistance:Number(fd.get("nearestDistance"))||null, layout:fd.get("layout"), age:fd.get("age"),
+    floor:Number(fd.get("floor"))||null, totalFloors:Number(fd.get("totalFloors"))||null,
     agent:fd.get("agent"), agentContact:fd.get("agentContact"), url:fd.get("url")
   });
   persist(); closeSheets(); render();
@@ -415,6 +420,8 @@ document.querySelector("#addForm").addEventListener("submit",e=>{
     nearestDistance:Number(fd.get("nearestDistance")) || null,
     layout:fd.get("layout"),
     age:fd.get("age"),
+    floor:Number(fd.get("floor")) || null,
+    totalFloors:Number(fd.get("totalFloors")) || null,
     url:fd.get("url"),
     agent:fd.get("agent"),
     agentContact:fd.get("agentContact"),
