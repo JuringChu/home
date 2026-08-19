@@ -6,3 +6,8 @@
 window.HOME_MAPS_CONFIG = {
   apiKey: "AIzaSyDzAQsXyN9hIRSEIH1TotL9GvPVF_h9D1I"
 };
+
+window.HOME_SYNC_CONFIG = {
+  url: "https://sfufztbnpxvbmpwtbpfv.supabase.co",
+  publishableKey: "sb_publishable__8Xa32k8BV2zakyTD3PPpw_Zh9QTJD6"
+};
