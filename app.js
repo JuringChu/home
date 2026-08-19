@@ -212,7 +212,9 @@ function openDetail(id, ratingMode=false){
     </div>
 
     <div class="sheet-footer-actions">
-      <button class="secondary-btn" data-reject>淘汰這間</button>
+      <button class="secondary-btn" data-edit>編輯資料</button>
+      <button class="danger-btn" data-delete>永久刪除</button>
+      <button class="secondary-btn" data-reject>暫時隱藏</button>
       <button class="primary-btn" data-finish>完成看房紀錄</button>
     </div>
   `;
@@ -269,6 +271,16 @@ document.querySelector("#detailSheet").addEventListener("click",e=>{
     p.status="rejected"; persist(); closeSheets(); render(); return;
   }
 
+  if(e.target.closest("[data-edit]")){
+    openEdit(id); return;
+  }
+
+  if(e.target.closest("[data-delete]")){
+    if(!window.confirm(`確定要永久刪除「${p.name}」嗎？這個動作無法復原。`)) return;
+    properties=properties.filter(x=>x.id!==id);
+    persist(); closeSheets(); render(); return;
+  }
+
   if(e.target.closest("[data-finish]")){
     if(p.status!=="candidate") p.status="seen";
     if(!p.mine){
@@ -303,6 +315,79 @@ HomeMaps.mountAutocomplete({
     document.querySelector("#locationStatus").textContent =
       data.formattedAddress;
   }
+});
+
+let editAutocompleteMounted=false;
+function mountEditAutocomplete(){
+  if(editAutocompleteMounted) return;
+  editAutocompleteMounted=true;
+  HomeMaps.mountAutocomplete({
+    mountId: "editGoogleAddressMount",
+    statusId: "editLocationStatus",
+    onSelect: data => {
+      document.querySelector("#editLocation").value = data.formattedAddress;
+      document.querySelector("#editLat").value = data.lat;
+      document.querySelector("#editLng").value = data.lng;
+      document.querySelector("#editZone").value = data.nearest.zone;
+      document.querySelector("#editNearestName").value = data.nearest.label;
+      document.querySelector("#editNearestDistance").value = data.nearest.distanceMeters;
+      document.querySelector("#editForm").dataset.addressSelected="true";
+      document.querySelector("#editNearestPreview").classList.remove("hidden");
+      document.querySelector("#editNearestPreviewTitle").textContent = `${data.nearest.zone}｜${data.nearest.label}`;
+      document.querySelector("#editNearestPreviewDistance").textContent = `直線距離約 ${HomeMaps.formatDistance(data.nearest.distanceMeters)}`;
+      document.querySelector("#editLocationStatus").textContent = data.formattedAddress;
+      document.querySelector("#editLocationStatus").classList.remove("maps-status-error");
+    }
+  });
+}
+
+function openEdit(id){
+  const p=properties.find(x=>x.id===id); if(!p)return;
+  mountEditAutocomplete();
+  document.querySelector("#editId").value=p.id;
+  document.querySelector("#editName").value=p.name||"";
+  document.querySelector("#editPrice").value=p.price??"";
+  document.querySelector("#editArea").value=p.area??"";
+  document.querySelector("#editLocation").value=p.location||"";
+  document.querySelector("#editLat").value=p.lat??"";
+  document.querySelector("#editLng").value=p.lng??"";
+  document.querySelector("#editZone").value=p.zone||"";
+  document.querySelector("#editNearestName").value=p.nearestName||"";
+  document.querySelector("#editNearestDistance").value=p.nearestDistance??"";
+  document.querySelector("#editLayout").value=p.layout||"";
+  document.querySelector("#editAge").value=p.age||"";
+  document.querySelector("#editAgent").value=p.agent||"";
+  document.querySelector("#editAgentContact").value=p.agentContact||"";
+  document.querySelector("#editUrl").value=p.url||"";
+  document.querySelector("#editForm").dataset.originalLocation=p.location||"";
+  document.querySelector("#editForm").dataset.addressSelected="false";
+  const hasNearest=p.nearestName&&p.nearestDistance;
+  document.querySelector("#editNearestPreview").classList.toggle("hidden",!hasNearest);
+  if(hasNearest){
+    document.querySelector("#editNearestPreviewTitle").textContent=`${p.zone}｜${p.nearestName}`;
+    document.querySelector("#editNearestPreviewDistance").textContent=`直線距離約 ${HomeMaps.formatDistance(Number(p.nearestDistance))}`;
+  }
+  document.querySelector("#editLocationStatus").textContent="地址不變可直接儲存；改地址時請從 Google 建議中選擇。";
+  closeSheets(); showSheet("#editSheet");
+}
+
+document.querySelector("#editForm").addEventListener("submit",e=>{
+  e.preventDefault();
+  const fd=new FormData(e.currentTarget);
+  const p=properties.find(x=>x.id===Number(fd.get("id"))); if(!p)return;
+  if(fd.get("location")!==e.currentTarget.dataset.originalLocation && e.currentTarget.dataset.addressSelected!=="true"){
+    document.querySelector("#editLocationStatus").textContent="改地址後，請從上方 Google 建議中重新選擇地址。";
+    document.querySelector("#editLocationStatus").classList.add("maps-status-error");
+    return;
+  }
+  Object.assign(p,{
+    name:fd.get("name"), price:Number(fd.get("price")), area:Number(fd.get("area")),
+    location:fd.get("location"), lat:Number(fd.get("lat"))||null, lng:Number(fd.get("lng"))||null,
+    zone:fd.get("zone")||p.zone||"", nearestName:fd.get("nearestName")||"",
+    nearestDistance:Number(fd.get("nearestDistance"))||null, layout:fd.get("layout"), age:fd.get("age"),
+    agent:fd.get("agent"), agentContact:fd.get("agentContact"), url:fd.get("url")
+  });
+  persist(); closeSheets(); render();
 });
 
 function openAdd(){ showSheet("#addSheet"); }
