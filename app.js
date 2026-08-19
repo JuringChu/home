@@ -28,7 +28,7 @@ const ratingLabels = {light:"採光",air:"通風",noise:"隔音",layout:"格局"
 const flaws = ["西曬","壁癌","漏水","水壓不足","浴室沒窗","暗房","噪音","垃圾處理麻煩","樓下餐廳","老舊電梯","管理室沒有24小時","戶數超過300","戶數小於50"];
 const advantages = ["離車站近","附近熱鬧","有充電樁","廁所有窗","離園區近"];
 
-function persist(){ localStorage.setItem("homebuying-properties-v2", JSON.stringify(properties)); }
+function persist(){ localStorage.setItem("homebuying-properties-v2", JSON.stringify(properties)); window.HomeSync?.save(properties); }
 function fmtPrice(n){ return Number(n).toLocaleString("zh-TW"); }
 
 function renderCounts(){
@@ -451,4 +451,10 @@ document.querySelector(".bottom-nav").addEventListener("click",e=>{
   document.querySelectorAll("[data-filter]").forEach(x=>x.classList.toggle("active",x.dataset.filter===currentFilter));
   renderCards();
   renderCompare();
+});
+
+window.HomeSync?.start(properties,remote=>{
+  properties=remote;
+  localStorage.setItem("homebuying-properties-v2",JSON.stringify(properties));
+  render();
 });
