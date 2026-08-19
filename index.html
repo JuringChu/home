@@ -155,6 +155,71 @@
     </form>
   </section>
 
+  <section class="bottom-sheet hidden" id="editSheet" aria-modal="true" role="dialog">
+    <div class="sheet-grab"></div>
+    <div class="sheet-head">
+      <div>
+        <p class="eyebrow">EDIT PROPERTY</p>
+        <h3>編輯房屋</h3>
+      </div>
+      <button class="icon-btn small" data-close>×</button>
+    </div>
+
+    <form id="editForm" class="form-grid">
+      <input type="hidden" name="id" id="editId" />
+      <label>房屋名稱
+        <input name="name" id="editName" required />
+      </label>
+
+      <div class="two-col">
+        <label>總價（萬）
+          <input name="price" id="editPrice" type="number" required />
+        </label>
+        <label>坪數
+          <input name="area" id="editArea" type="number" step="0.1" required />
+        </label>
+      </div>
+
+      <label>房屋地址
+        <div id="editGoogleAddressMount" class="google-address-mount"></div>
+        <input name="location" id="editLocation" placeholder="目前地址" required />
+        <input type="hidden" name="lat" id="editLat" />
+        <input type="hidden" name="lng" id="editLng" />
+        <input type="hidden" name="zone" id="editZone" />
+        <input type="hidden" name="nearestName" id="editNearestName" />
+        <input type="hidden" name="nearestDistance" id="editNearestDistance" />
+        <small class="form-help" id="editLocationStatus">地址不變可直接儲存；改地址時請從 Google 建議中選擇。</small>
+      </label>
+
+      <div id="editNearestPreview" class="nearest-preview hidden">
+        <span>自動分類</span>
+        <strong id="editNearestPreviewTitle">—</strong>
+        <small id="editNearestPreviewDistance">—</small>
+      </div>
+
+      <div class="two-col">
+        <label>格局
+          <input name="layout" id="editLayout" />
+        </label>
+        <label>屋齡
+          <input name="age" id="editAge" />
+        </label>
+      </div>
+
+      <label>房仲
+        <input name="agent" id="editAgent" />
+      </label>
+      <label>房仲聯絡方式
+        <input name="agentContact" id="editAgentContact" />
+      </label>
+      <label>物件網址
+        <input name="url" id="editUrl" type="url" />
+      </label>
+
+      <button class="primary-btn" type="submit">儲存變更</button>
+    </form>
+  </section>
+
   <script src="config.js"></script>
   <script src="maps.js"></script>
   <script src="app.js"></script>
