@@ -21,18 +21,10 @@
 
     <main>
       <section class="progress-grid" id="progressGrid">
-        <button class="progress-card active" data-filter="all">
-          <span>全部</span><strong id="countAll">6</strong>
-        </button>
-        <button class="progress-card" data-filter="saved">
-          <span>收藏</span><strong id="countSaved">2</strong>
-        </button>
-        <button class="progress-card" data-filter="todo">
-          <span>待看</span><strong id="countTodo">2</strong>
-        </button>
-        <button class="progress-card" data-filter="seen">
-          <span>已看</span><strong id="countSeen">2</strong>
-        </button>
+        <button class="progress-card active" data-filter="all"><span>全部</span><strong id="countAll">0</strong></button>
+        <button class="progress-card" data-filter="saved"><span>收藏</span><strong id="countSaved">0</strong></button>
+        <button class="progress-card" data-filter="todo"><span>待看</span><strong id="countTodo">0</strong></button>
+        <button class="progress-card" data-filter="seen"><span>已看</span><strong id="countSeen">0</strong></button>
       </section>
 
       <section class="area-filter-wrap">
@@ -60,25 +52,35 @@
       <section id="cardView" class="property-list"></section>
 
       <section id="tableView" class="compare-wrap hidden">
-        <div class="compare-tip">左右滑動比較已看與候選房屋</div>
-        <div class="compare-table" id="compareTable"></div>
+        <div class="compare-intro">
+          <div>
+            <p class="eyebrow">COMPARE</p>
+            <h3>選兩間比較</h3>
+          </div>
+          <small>不限狀態，收藏中的房屋也可以比較</small>
+        </div>
+
+        <div class="compare-pickers">
+          <label>
+            房屋 A
+            <select id="compareA"></select>
+          </label>
+          <label>
+            房屋 B
+            <select id="compareB"></select>
+          </label>
+        </div>
+
+        <div id="compareTable" class="compare-mobile"></div>
       </section>
     </main>
 
     <nav class="bottom-nav">
-      <button class="nav-item active" data-nav="home">
-        <span>⌂</span><small>首頁</small>
-      </button>
-      <button class="nav-item" data-nav="todo">
-        <span>◉</span><small>待看</small>
-      </button>
+      <button class="nav-item active" data-nav="home"><span>⌂</span><small>首頁</small></button>
+      <button class="nav-item" data-nav="todo"><span>◉</span><small>待看</small></button>
       <button class="fab" id="fabAdd" aria-label="新增房屋">＋</button>
-      <button class="nav-item" data-nav="compare">
-        <span>⇄</span><small>比較</small>
-      </button>
-      <button class="nav-item" data-nav="candidate">
-        <span>★</span><small>候選</small>
-      </button>
+      <button class="nav-item" data-nav="compare"><span>⇄</span><small>比較</small></button>
+      <button class="nav-item" data-nav="candidate"><span>★</span><small>候選</small></button>
     </nav>
   </div>
 
@@ -92,10 +94,7 @@
   <section class="bottom-sheet hidden" id="addSheet" aria-modal="true" role="dialog">
     <div class="sheet-grab"></div>
     <div class="sheet-head">
-      <div>
-        <p class="eyebrow">ADD PROPERTY</p>
-        <h3>新增房屋</h3>
-      </div>
+      <div><p class="eyebrow">ADD PROPERTY</p><h3>新增房屋</h3></div>
       <button class="icon-btn small" data-close>×</button>
     </div>
 
@@ -117,7 +116,7 @@
         <div id="googleAddressMount" class="google-address-mount">
           <div class="maps-placeholder">Google 地址搜尋載入中…</div>
         </div>
-        <input name="location" id="locationFallback" class="hidden-input" placeholder="請先設定 Google Maps API Key" />
+        <input name="location" id="locationFallback" class="hidden-input" />
         <input type="hidden" name="lat" id="selectedLat" />
         <input type="hidden" name="lng" id="selectedLng" />
         <input type="hidden" name="zone" id="selectedZone" />
@@ -133,22 +132,18 @@
       </div>
 
       <div class="two-col">
-        <label>格局
-          <input name="layout" placeholder="2房2廳1衛" />
-        </label>
-        <label>屋齡
-          <input name="age" placeholder="8 年" />
-        </label>
+        <label>格局<input name="layout" placeholder="2房2廳1衛" /></label>
+        <label>屋齡<input name="age" placeholder="8 年" /></label>
       </div>
 
       <div class="two-col">
-        <label>所在樓層
-          <input name="floor" type="number" min="-5" placeholder="例如：12" />
-        </label>
-        <label>總樓層
-          <input name="totalFloors" type="number" min="1" placeholder="例如：20" />
-        </label>
+        <label>所在樓層<input name="floor" type="number" min="-5" placeholder="例如：12" /></label>
+        <label>總樓層<input name="totalFloors" type="number" min="1" placeholder="例如：20" /></label>
       </div>
+
+      <label>建商
+        <input name="builder" placeholder="例如：坤山建設" />
+      </label>
 
       <label>房仲
         <input name="agent" placeholder="例如：永慶房屋 王先生" />
@@ -162,6 +157,10 @@
         <input name="url" type="url" placeholder="https://..." />
       </label>
 
+      <label>備註
+        <textarea name="notes" rows="4" placeholder="例如：屋主自住、下午採光佳、第二次看房要確認管理費…"></textarea>
+      </label>
+
       <button class="primary-btn" type="submit">加入收藏</button>
     </form>
   </section>
@@ -169,26 +168,18 @@
   <section class="bottom-sheet hidden" id="editSheet" aria-modal="true" role="dialog">
     <div class="sheet-grab"></div>
     <div class="sheet-head">
-      <div>
-        <p class="eyebrow">EDIT PROPERTY</p>
-        <h3>編輯房屋</h3>
-      </div>
+      <div><p class="eyebrow">EDIT PROPERTY</p><h3>編輯房屋</h3></div>
       <button class="icon-btn small" data-close>×</button>
     </div>
 
     <form id="editForm" class="form-grid">
       <input type="hidden" name="id" id="editId" />
-      <label>房屋名稱
-        <input name="name" id="editName" required />
-      </label>
+
+      <label>房屋名稱<input name="name" id="editName" required /></label>
 
       <div class="two-col">
-        <label>總價（萬）
-          <input name="price" id="editPrice" type="number" required />
-        </label>
-        <label>坪數
-          <input name="area" id="editArea" type="number" step="0.1" required />
-        </label>
+        <label>總價（萬）<input name="price" id="editPrice" type="number" required /></label>
+        <label>坪數<input name="area" id="editArea" type="number" step="0.1" required /></label>
       </div>
 
       <label>房屋地址
@@ -209,32 +200,20 @@
       </div>
 
       <div class="two-col">
-        <label>格局
-          <input name="layout" id="editLayout" />
-        </label>
-        <label>屋齡
-          <input name="age" id="editAge" />
-        </label>
+        <label>格局<input name="layout" id="editLayout" /></label>
+        <label>屋齡<input name="age" id="editAge" /></label>
       </div>
 
       <div class="two-col">
-        <label>所在樓層
-          <input name="floor" id="editFloor" type="number" min="-5" />
-        </label>
-        <label>總樓層
-          <input name="totalFloors" id="editTotalFloors" type="number" min="1" />
-        </label>
+        <label>所在樓層<input name="floor" id="editFloor" type="number" min="-5" /></label>
+        <label>總樓層<input name="totalFloors" id="editTotalFloors" type="number" min="1" /></label>
       </div>
 
-      <label>房仲
-        <input name="agent" id="editAgent" />
-      </label>
-      <label>房仲聯絡方式
-        <input name="agentContact" id="editAgentContact" />
-      </label>
-      <label>物件網址
-        <input name="url" id="editUrl" type="url" />
-      </label>
+      <label>建商<input name="builder" id="editBuilder" /></label>
+      <label>房仲<input name="agent" id="editAgent" /></label>
+      <label>房仲聯絡方式<input name="agentContact" id="editAgentContact" /></label>
+      <label>物件網址<input name="url" id="editUrl" type="url" /></label>
+      <label>備註<textarea name="notes" id="editNotes" rows="4"></textarea></label>
 
       <button class="primary-btn" type="submit">儲存變更</button>
     </form>
