@@ -35,6 +35,11 @@ function migrateProperties(list){
   });
 }
 function persist(){
+  // 訪客模式只改目前頁面的假資料，不碰真實 localStorage / Supabase。
+  if(window.HomeSync?.isGuest?.()){
+    window.HomeSync.save(properties);
+    return;
+  }
   localStorage.setItem("homebuying-properties-v2", JSON.stringify(properties));
   window.HomeSync?.save(properties);
 }
@@ -486,6 +491,9 @@ document.querySelector(".bottom-nav").addEventListener("click",e=>{
 
 window.HomeSync?.start(properties,remote=>{
   properties=migrateProperties(remote);
-  localStorage.setItem("homebuying-properties-v2",JSON.stringify(properties));
+  // 訪客資料只存在記憶體，不覆蓋已存在的真實資料。
+  if(!window.HomeSync?.isGuest?.()){
+    localStorage.setItem("homebuying-properties-v2",JSON.stringify(properties));
+  }
   render();
 });
